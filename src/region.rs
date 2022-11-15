@@ -1,3 +1,5 @@
+use std::io::{Result, Write};
+
 #[derive(Default, Clone, Copy, Debug)]
 pub struct Region {
 	data: [i16; 4],
@@ -8,6 +10,17 @@ impl Region {
 		Self {
 			data: [0, 0, size[0], size[1]]
 		}
+	}
+
+	pub fn len(&self) -> usize {
+		if self.is_empty() { return 0 }
+		(self.data[2] - self.data[0]) as usize *
+			(self.data[3] - self.data[1]) as usize 
+	}
+
+	pub fn is_empty(&self) -> bool {
+		self.data[0] >= self.data[2] ||
+			self.data[1] >= self.data[3]
 	}
 
 	pub fn union(&self, other: &Self) -> Self {
@@ -32,7 +45,21 @@ impl Region {
 		result
 	}
 
-	pub fn to_le_bytes(&self) {}
+	pub fn write_le_bytes<W: Write>(&self, mut w: W) -> Result<()> {
+		for i in 0..4 {
+			w.write(&self.data[i].to_le_bytes())?;
+		}
+		Ok(())
+	}
 
-	pub fn from_le_bytes() {}
+	pub fn from_le_bytes(bytes: &[u8]) -> Self {
+		let data: [i16; 4] = core::array::from_fn(|idx| {
+			i16::from_le_bytes(bytes[idx * 2..idx * 2 + 2].try_into().unwrap())
+		});
+		Self { data }
+	}
+
+	pub fn data(&self) -> [i16; 4] {
+		self.data
+	}
 }
