@@ -12,6 +12,10 @@ impl Region {
 		}
 	}
 
+	pub fn new(data: [i16; 4]) -> Self {
+		Self { data }
+	}
+
 	pub fn len(&self) -> usize {
 		if self.is_empty() { return 0 }
 		(self.data[2] - self.data[0]) as usize *
@@ -24,6 +28,8 @@ impl Region {
 	}
 
 	pub fn union(&self, other: &Self) -> Self {
+		if self.is_empty() { return *other }
+		if other.is_empty() { return *self }
 		let mut result = Self::default();
 		for idx in 0..2 {
 			result.data[idx] = self.data[idx].min(other.data[idx])

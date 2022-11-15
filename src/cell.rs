@@ -4,11 +4,12 @@ fn read_u32(bytes: &[u8]) -> u32 {
 	u32::from_le_bytes(bytes[0..4].try_into().unwrap())
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct Cell {
 	pub ch: u32,
 	pub fg: u32,
 	pub bg: u32,
+	// bold italic underline
 	pub de: u32,
 }
 
@@ -20,6 +21,17 @@ impl Default for Cell {
 			bg: 0,
 			de: 0,
 		}
+	}
+}
+
+impl std::fmt::Debug for Cell {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "Cell {{ ch: {}, fg: {:x}, bg: {:x}, de: {:x} }}",
+			self.ch,
+			self.fg,
+			self.bg,
+			self.de,
+		)
 	}
 }
 
